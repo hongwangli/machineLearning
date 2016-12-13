@@ -11,12 +11,29 @@ def get_distance(vector1,vector2):
     distance = np.sqrt(np.sum((vector1 - vector2)**2))
     return distance
 
+def get_distance_Manhattan(vector1, vector2):
+    distance = np.sum(np.fabs(vector1 - vector2))
+    return distance
+
+def get_distance_cosine(vector1, vector2):
+    cosine_theta = float(np.dot(vector1,vector2))/(np.sqrt(np.sum(vector1 ** 2)) * np.sqrt(np.sum(vector2 ** 2)))
+    distance = 1 - cosine_theta
+    return distance
+
+def get_distance_pearson(vector1,vector2):
+    cov_xy = np.mean((vector1 - np.mean(vector1)) * (vector2 - np.mean(vector2)))
+    std_xy = np.std(vector1) * np.std(vector2)
+    pearson = cov_xy / std_xy
+    distance = 1 - pearson
+    return distance
+
 def reCenter(data_result,k):
     centers = []
     nrow,ncol = data_result.shape
     for j in xrange(k):                                                                                   
         data_cluster = data_result[data_result[:,ncol-1]==j]
         center = np.mean(data_cluster,axis=0)  
+        #print 'center:  ',center
         centers.append(center[0:ncol-1])
     return centers
 
@@ -82,19 +99,19 @@ def plot_cost(cost):
 if __name__ == '__main__':
     K = 10
     iter_max = 10
-    eplise = 0.001
+    eplise = 0
 
     data  = pd.read_csv('/root/Desktop/machineLearning/kmeans/kmeans_test.csv')
     data_array = np.array(data)
     nrow,ncol = data_array.shape
     data_result = np.hstack((data_array,np.zeros(nrow).reshape(nrow,1)))
 
-    costs = find_best_k(data_result,K,eplise)
-    plot_cost(costs)
+    #costs = find_best_k(data_result,K,eplise)
+    #plot_cost(costs)
 
-    #k =  4
-    #centers = [data_result[random.randint(0,nrow-1),0: ncol] for i in xrange(k)]
-    #data_result,costs,centers = kmeans(data_result,centers,k,eplise)
-    #showCluster(data_result,k,centers)
+    k =  4
+    centers = [data_result[random.randint(0,nrow-1),0: ncol] for i in xrange(k)]
+    data_result,costs,centers = kmeans(data_result,centers,k,eplise)
+    showCluster(data_result,k,centers)
 
 
