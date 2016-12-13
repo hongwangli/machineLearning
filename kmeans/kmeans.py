@@ -64,7 +64,7 @@ def kmeans(data_result,centers,k,eplise):
         loop += 1 
     return data_result,costs,centers
 
-def showCluster(data_result,k,centers):
+def showCluster(data_result,k,centers,init_centers):
     nrow,ncol = data_result.shape
     mark = ['or', 'ob', 'og', 'ok', '^r', '+r', 'sr', 'dr', '<r', 'pr']  
     for i in xrange(nrow):  
@@ -73,6 +73,11 @@ def showCluster(data_result,k,centers):
     mark = ['Dr', 'Db', 'Dg', 'Dk', '^b', '+b', 'sb', 'db', '<b', 'pb'] 
     for i in range(k):                                                                                    
         plt.plot(centers[i][0], centers[i][1], mark[i], markersize = 12) 
+
+    mark = ['+b', 'sb', 'db', '<b', 'pb','Dr', 'Db', 'Dg', 'Dk', '^b'] 
+
+    #for i in range(k):                                                                                   
+    #    plt.plot(init_centers[i][0], init_centers[i][1], mark[i], markersize = 12) 
     plt.show()
 
 
@@ -96,6 +101,69 @@ def plot_cost(cost):
     plt.plot(leng, cost)
     plt.show()    
 
+
+def initCenters_random(data_result,k):
+    nrow,ncol = data_result.shape
+    centers = [data_result[random.randint(0,nrow-1),0: ncol-1] for i in xrange(k)]  
+    return centers
+
+
+def find_max_point(data_result,point):
+    nrow,ncol = data_result.shape
+    result_point = []
+    max_distance = 0
+    for i in xrange(nrow):
+        distance = get_distance(data_result[i,:(ncol-1)],point)
+        if distance > max_distance:
+           max_distance = distance
+           result_point = data_result[i,:(ncol-1)]
+    return result_point
+
+def init_centers_max_distance(data_result,k):
+    nrow,ncol = data_result.shape
+    point = np.mean(data_result,axis = 0)[0:ncol-1]
+    centers = [point]
+    for i in xrange(k-1):
+        max_point = find_max_point(data_result,point) 
+        centers.append(max_point)
+        print 'centersL:',centers
+        point = np.mean(centers,axis =0)
+        print 'point',point
+    return centers 
+
+def find_min_max_point(data_result,centers):
+    nrow,ncol = data_result.shape
+    max_distance = 0
+    k = len(centers)
+    max_distance = 0
+    index = -1
+    for i in xrange(nrow):
+        min_distance = float("inf") 
+        for j in xrange(k-1):          
+            distance = get_distance(data_result[i,:(ncol-1)],centers[j]) 
+            if distance < min_distance:
+               min_distance = distance
+        if min_distance > max_distance:
+            max_distance = min_distance
+            point_new = data_result[i,:(ncol-1)]
+            index = i
+    return point_new,index  
+
+def init_centers_max_distance(data_result,k):
+    nrow,ncol = data_result.shape
+    random_point = np.mean(data_result,axis = 0)[0:ncol-1]
+    centers = [random_point]
+    for i in xrange(k-1):
+        new_point,index = find_min_max_point(data_result,centers)
+        data_result = np.delete(data_result,index,0)
+        nnrow,nncol = data_result.shape
+        print 'indexL,',index
+        print 'nnrow',nnrow
+        print 'nncol',nncol
+        centers.append(new_point)
+    return centers
+
+
 if __name__ == '__main__':
     K = 10
     iter_max = 10
@@ -109,9 +177,45 @@ if __name__ == '__main__':
     #costs = find_best_k(data_result,K,eplise)
     #plot_cost(costs)
 
-    k =  4
-    centers = [data_result[random.randint(0,nrow-1),0: ncol] for i in xrange(k)]
-    data_result,costs,centers = kmeans(data_result,centers,k,eplise)
-    showCluster(data_result,k,centers)
+    k = 4 
+    init_centers = init_centers_max_distance(data_result,k)
+    print 'init_centers',init_centers
+    data_result,costs,centers = kmeans(data_result,init_centers,k,eplise)
+    print 'centers',centers
+    showCluster(data_result,k,centers,init_centers)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
