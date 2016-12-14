@@ -126,9 +126,7 @@ def init_centers_max_distance(data_result,k):
     for i in xrange(k-1):
         max_point = find_max_point(data_result,point) 
         centers.append(max_point)
-        print 'centersL:',centers
         point = np.mean(centers,axis =0)
-        print 'point',point
     return centers 
 
 def find_min_max_point(data_result,centers):
@@ -157,12 +155,48 @@ def init_centers_max_distance(data_result,k):
         new_point,index = find_min_max_point(data_result,centers)
         data_result = np.delete(data_result,index,0)
         nnrow,nncol = data_result.shape
-        print 'indexL,',index
-        print 'nnrow',nnrow
-        print 'nncol',nncol
         centers.append(new_point)
     return centers
 
+def get_r1(data_array):
+    center = np.mean(data_array,axis = 0)
+    nrow,ncol = data_array.shape
+    d_sum = 0
+    for i in xrange(nrow):
+        distance = get_distance(data_array[i],center)
+        d_sum += distance
+    r1 = d_sum / nrow
+    return r1
+
+
+def canopy(data_array,r1):
+    r2 = 2 * r1
+    k = 0
+    centers = []
+    clusters = []
+    while (len(data_array) != 0 ):
+       nrow,ncol = data_array.shape
+       init = random.randint(0,nrow-1)
+       init_point = data_array[init]
+       cluster = []
+       indexes = []
+       for i in xrange(nrow):
+           distance = get_distance(data_array[i],init_point)
+           if distance < r2:
+              cluster.append(data_array[i])
+           if distance < r1:
+              indexes.append(i)
+
+       data_array = np.delete(data_array,indexes,0)
+
+       center = np.mean(cluster, axis = 0)
+       centers.append(center)
+       #print 'cluster',cluster
+       #clusters[k] = cluster
+       k += 1
+       #print 'k',k
+    return centers,k 
+       
 
 if __name__ == '__main__':
     K = 10
