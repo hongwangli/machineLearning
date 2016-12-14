@@ -108,26 +108,26 @@ def initCenters_random(data_result,k):
     return centers
 
 
-def find_max_point(data_result,point):
-    nrow,ncol = data_result.shape
-    result_point = []
-    max_distance = 0
-    for i in xrange(nrow):
-        distance = get_distance(data_result[i,:(ncol-1)],point)
-        if distance > max_distance:
-           max_distance = distance
-           result_point = data_result[i,:(ncol-1)]
-    return result_point
-
-def init_centers_max_distance(data_result,k):
-    nrow,ncol = data_result.shape
-    point = np.mean(data_result,axis = 0)[0:ncol-1]
-    centers = [point]
-    for i in xrange(k-1):
-        max_point = find_max_point(data_result,point) 
-        centers.append(max_point)
-        point = np.mean(centers,axis =0)
-    return centers 
+#def find_max_point(data_result,point):
+#    nrow,ncol = data_result.shape
+#    result_point = []
+#    max_distance = 0
+#    for i in xrange(nrow):
+#        distance = get_distance(data_result[i,:(ncol-1)],point)
+#        if distance > max_distance:
+#           max_distance = distance
+#           result_point = data_result[i,:(ncol-1)]
+#    return result_point
+#
+#def init_centers_max_distance(data_result,k):
+#    nrow,ncol = data_result.shape
+#    point = np.mean(data_result,axis = 0)[0:ncol-1]
+#    centers = [point]
+#    for i in xrange(k-1):
+#        max_point = find_max_point(data_result,point) 
+#        centers.append(max_point)
+#        point = np.mean(centers,axis =0)
+#    return centers 
 
 def find_min_max_point(data_result,centers):
     nrow,ncol = data_result.shape
@@ -192,10 +192,10 @@ def canopy(data_array,r1):
        center = np.mean(cluster, axis = 0)
        centers.append(center)
        #print 'cluster',cluster
-       #clusters[k] = cluster
+       clusters.append(cluster)
        k += 1
        #print 'k',k
-    return centers,k 
+    return clusters,centers,k 
        
 
 if __name__ == '__main__':
@@ -204,19 +204,24 @@ if __name__ == '__main__':
     eplise = 0
 
     data  = pd.read_csv('/root/Desktop/machineLearning/kmeans/kmeans_test.csv')
+    #data = pd.read_csv('http://oheum0xlq.bkt.clouddn.com/kmeans_test.csv')
     data_array = np.array(data)
     nrow,ncol = data_array.shape
     data_result = np.hstack((data_array,np.zeros(nrow).reshape(nrow,1)))
-
+    r1 = get_r1(data_array)
+    clusters,centers,k = canopy(data_array,r1)
+    print 'clustersL',clusters
+    print 'centers',centers
+    print 'k',k
     #costs = find_best_k(data_result,K,eplise)
     #plot_cost(costs)
 
-    k = 4 
-    init_centers = init_centers_max_distance(data_result,k)
-    print 'init_centers',init_centers
-    data_result,costs,centers = kmeans(data_result,init_centers,k,eplise)
-    print 'centers',centers
-    showCluster(data_result,k,centers,init_centers)
+    #k = 4 
+    #init_centers = init_centers_max_distance(data_result,k)
+    #print 'init_centers',init_centers
+    #data_result,costs,centers = kmeans(data_result,init_centers,k,eplise)
+    #print 'centers',centers
+    #showCluster(data_result,k,centers,init_centers)
 
 
 
