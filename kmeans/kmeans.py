@@ -108,17 +108,6 @@ def initCenters_random(data_result,k):
     return centers
 
 
-#def find_max_point(data_result,point):
-#    nrow,ncol = data_result.shape
-#    result_point = []
-#    max_distance = 0
-#    for i in xrange(nrow):
-#        distance = get_distance(data_result[i,:(ncol-1)],point)
-#        if distance > max_distance:
-#           max_distance = distance
-#           result_point = data_result[i,:(ncol-1)]
-#    return result_point
-#
 #def init_centers_max_distance(data_result,k):
 #    nrow,ncol = data_result.shape
 #    point = np.mean(data_result,axis = 0)[0:ncol-1]
@@ -222,39 +211,5 @@ if __name__ == '__main__':
     #data_result,costs,centers = kmeans(data_result,init_centers,k,eplise)
     #print 'centers',centers
     #showCluster(data_result,k,centers,init_centers)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
