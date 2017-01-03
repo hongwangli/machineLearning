@@ -56,18 +56,15 @@ def select_index_j(index_i,alpha,b,data,error):
     if len(nz_index)>0:
         for j in nz_index:
             e_j = get_e(alpha,b,j,data,option)
-            #print 'e_j',e_j 
             if abs(e_i - e_j) > max_error:
                 max_error = abs(e_i - e_j)
                 index_j = j
                 e_index_j = e_j
     else :
-        #print 'what is wrong'
         index_j = index_i
         while index_i == index_j:
               index_j = random.randint(0,nrow) 
         e_index_j = get_e(alpha,b,index_j,data,option)
-    #print 'index_j',index_j
     return index_j,e_index_j
 
 
@@ -75,47 +72,31 @@ def select_index_j(index_i,alpha,b,data,error):
 def update_alpha_b(index_i,alpha,b,C,toler,error,data,kernelMatrix):
     index_j,e_j = select_index_j(index_i,alpha,b,data,error) 
     alpha_i_old = alpha[index_i]
-
     alpha_j_old = alpha[index_j]
-
     nrow,ncol = data.shape
     y = data.iloc[:,ncol-1]
     y_i = y[index_i]
     y_j = y[index_j]
 
     u_i = get_u_i(alpha,b,data,data.iloc[index_i,0:ncol-1],option)
-    u_j = get_u_i(alpha,b,data,data.iloc[index_j,0:ncol-1],option)
     e_i = u_i - y_i
-    e_j = u_j - y_j
-    print 'index_i is %s ,e_i is %s:' % (index_i,e_i)
-    print 'index_j is %s ,e_j is %s:' % (index_j,e_j)
-    ###index_j,e_j = select_index_j(index_i,alpha,b,data,error)  
-    #e_i = error[index_i,1]
-    #e_j = error[index_j,1] 
-    #if (y_i * u_i < 1 - toler and alpha_i_old < C ) or (y_i * u_i >  1 + toler  and alpha_i_old >0 ) :
     if (y_i * e_i <  -toler) and (alpha_i_old < C ) or (y_i * e_i >  toler)  and (alpha_i_old >0 ) :
   
         eta_h = kernelMatrix[index_i,index_i] + kernelMatrix[index_j,index_j] \
               - 2 * kernelMatrix[index_i,index_j]  
-        #print 'eta:---:',eta
         if eta_h < 0:
             return alpha,b,error,0        
-        print 'change section:', y_j*(e_i - e_j)/eta_h
+
         alpha_j_new = alpha_j_old + y_j*(e_i - e_j)/eta_h
-        print 'alpha_j_new is %s, alpha_j_old is %s' % (alpha_j_new,alpha_j_old)
-        print 'alpha_j_old - alpha_j_new: ',alpha_j_old - alpha_j_new 
         L,H = get_L_H(y_i,y_j,alpha_i_old,alpha_j_old,C)
         if L == H:
             return alpha,b,error,0       
-        print 'L is %s H is %s' % (L,H)
+
         if alpha_j_new > H:
-           print '1111'
            alpha_j_new = H
         if alpha_j_new < L:
-           print '2222'
            alpha_j_new = L
 
-        print 'alpha_j_new: ',alpha_j_new
         if abs(alpha_j_old - alpha_j_new) < 0.00001:
             alpha[index_j] = alpha_j_new
             e_j_new = get_e(alpha,b,index_j,data,option)
@@ -134,8 +115,7 @@ def update_alpha_b(index_i,alpha,b,C,toler,error,data,kernelMatrix):
             b = b_j_new
         else:
             b = (b_i_new + b_j_new) * 0.5
-        #print 'alpha_i_new',alpha_i_new
-        #print 'alpha_j_new',alpha_j_new
+
         alpha[index_i] = alpha_i_new
         alpha[index_j] = alpha_j_new
         e_i_new = get_e(alpha,b,index_i,data,option)
@@ -144,7 +124,6 @@ def update_alpha_b(index_i,alpha,b,C,toler,error,data,kernelMatrix):
         error[index_j] = [1,e_j_new]
         return alpha,b,error,1
     else:
-        print 'in the else'
         return alpha,b,error,0
 
 
@@ -159,7 +138,6 @@ def smo(iter_max,toler,data,alpha,b,error,C):
           #print 'begin changed_num:',changed_nums
           if all_set :
               for index_i in xrange(nrow):
-                  #index_j,e_index_j = select_index_j(index_i,alpha,b,data,error) 
                   alpha,b,error,changed_num = update_alpha_b(index_i,alpha,b,C,toler,error,data,kernelMatrix)  
                   changed_nums += changed_num
               iter += 1
@@ -167,7 +145,6 @@ def smo(iter_max,toler,data,alpha,b,error,C):
           else:
               index_0_C = np.nonzero((alpha > 0) * (alpha < C) )[0]
               for index_i in index_0_C:
-                  #index_j,e_index_j = select_index_j(index_i,alpha,b,data,error) 
                   alpha,b,error,changed_num = update_alpha_b(index_i,alpha,b,C,toler,error,data,kernelMatrix)
                   changed_nums += changed_num
               print 'not all set changed_nums:',changed_nums
