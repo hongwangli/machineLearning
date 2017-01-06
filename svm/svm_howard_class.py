@@ -206,6 +206,7 @@ def showSVM(svm):
 
 if __name__=='__main__':
     data = pd.read_csv('/root/Desktop/machineLearning/svm/testSet_svm.csv')  
+    #data = pd.read_csv('http://oheum0xlq.bkt.clouddn.com/testSet_svm.csv')
     dataArray_train = np.array(data)[0:81,:]
     dataArray_test = np.array(data)[80:,:]
     C = 0.6
