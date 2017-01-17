@@ -24,7 +24,7 @@ def plot_cost(cost):
     plt.show()
 
 alpha = 0.1
-lamb = 0.3
+reg_lambda = 0.3
 
 data = pd.read_csv('trainData.csv')
 data_array = np.array(data)
@@ -43,17 +43,10 @@ costJs =[]
 
 for i in xrange(1000):
 
-    #np.random.seed(2)
-    #Delta_W_2 = np.random.random(size=(3,1))
-    #Delta_W_1 = np.random.random(size=(4,3))
-    #Delta_b_2 = np.random.random(size=(1,1))
-    #Delta_b_1 = np.random.random(size=(1,3))
-
     W_b_1 = np.vstack((W1,b1))
     z2 = np.dot(X,W_b_1)
     a2 = sigmoid(z2)
     a2_1 = np.hstack((a2,np.repeat(1,nrow).reshape(nrow,1)))
-    
     
     W_b_2 = np.vstack((W2,b2))
     z3 = np.dot(a2_1,W_b_2)
@@ -64,27 +57,20 @@ for i in xrange(1000):
     delta_3 = -np.multiply((Y - a3),sigmoid_derivative(z3))
     delta_2 = np.multiply(np.dot(delta_3,W2.T) ,sigmoid_derivative(z2))
     
-    
     Delta_W_2_J = np.dot(a2.T, delta_3) 
     Delta_W_1_J = np.dot(scale_X.T,delta_2)
     Delta_b_2_J = delta_3.sum(axis = 0)
     Delta_b_1_J = delta_2.sum(axis = 0)
 
-    #Delta_W_2 += Delta_W_2_J
-    #Delta_W_1 += Delta_W_1_J
-    #Delta_b_2 += Delta_b_2_J
-    #Delta_b_1 += Delta_b_1_J
-    
+    Delta_W_2_J += reg_lambda * W2
+    Delta_W_1_J += reg_lambda * W1
+
     W2 += -alpha * Delta_W_2_J
     W1 += -alpha * Delta_W_1_J
     b1 += -alpha * Delta_b_1_J
     b2 += -alpha * Delta_b_2_J
 
-    #W2 += -alpha * float(1)/nrow * Delta_W_2_J 
-    #W1 += -alpha * float(1)/nrow * Delta_W_1_J
-    #b1 += -alpha * float(1)/nrow * Delta_b_1_J
-    #b2 += -alpha * float(1)/nrow * Delta_b_2_J  
 plot_cost(costJs)
 
 
-print costJs[0:10]
+
