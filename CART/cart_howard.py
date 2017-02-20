@@ -70,6 +70,42 @@ def buildTree(data_array,ops=(1,4)):
         less_branch = buildTree(array_2,ops)
         return node(col = col,value = val,gb = greater_branch ,lb = less_branch )
 
+def treeForeCast(tree, inData):
+    if tree.results != None:
+        return tree.results
+    #print 'tree.col:',tree.col
+    if inData[tree.col] > tree.value:
+       return treeForeCast(tree.gb, inData)
+    else:   
+       return treeForeCast(tree.lb, inData)
+
+def createForeCast(tree, testData):
+    m=len(testData)
+    yHat = np.mat(np.zeros((m,1)))
+    for i in range(m):
+        yHat[i,0] = treeForeCast(tree, testData[i])
+    return yHat
+
+def gbdt(data_array,num_iter,ops = (1,4)):
+    m,n = data_array.shape
+    x = data_array[:,0:-1]
+    y = data_array[:,-1].reshape((m,1))
+    list_trees = []
+    for i in xrange(num_iter):
+        print 'i: ',i
+        if i == 0:
+           tree = buildTree(data_array,ops)
+           list_trees.append(tree)
+           yHat = createForeCast(tree,x)
+        else:
+           r = y - np.array(yHat)
+           data_array = np.hstack((x,r))
+           tree = buildTree(data_array,ops)
+           list_trees.append(tree)
+           rHat = createForeCast(tree, x )
+           yHat = yHat + rHat
+    return list_trees
+
 
 def printtree(tree,indent=''):
    # Is this a leaf node?
@@ -130,11 +166,16 @@ def drawnode(draw,tree,x,y):
     txt=str(tree.results)
     #txt = 'i am god'
     draw.text((x-20,y),txt,(0,0,0))
+
 if __name__ == '__main__':
+    #trainMat=(loadDataSet('bikeSpeedVsIq_train.txt'))
+    #testMat=mat(loadDataSet('bikeSpeedVsIq_test.txt'))
     data = loadDataSet('ex0.txt')
     data_array = np.array(data)
     tree = buildTree(data_array)
     printtree(tree)
     drawtree(tree,jpeg='treeview_cart.jpg')
+
+    gbdt_results = gbdt(data_array,10)
 
 
