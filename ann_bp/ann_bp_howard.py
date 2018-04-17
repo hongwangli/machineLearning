@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from sklearn import preprocessing
 import matplotlib.pyplot as plt
-from sklearn import dataset 
+from sklearn import datasets 
 def sigmoid(z):
     y=1.0 / (1 + np.exp(-z))
     return y
@@ -120,8 +120,8 @@ if __name__ == '__main__':
     
     alpha = 0.1
     reg_lambda = 0.3
-    data = dataset.load_iris()   
-    data_array = np.hstack((data['data'],data['target']))
+    data = datasets.load_iris()   
+    data_array = np.hstack((data['data'],data['target'].reshape(-1,1)))
     data_array[data_array[:,-1]==2,-1] = 1
     num_2 = 3
     num_3 = 2
