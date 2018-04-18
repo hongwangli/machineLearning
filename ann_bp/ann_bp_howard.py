@@ -132,4 +132,10 @@ if __name__ == '__main__':
     ann_o.get_arg_softmax()
     plot_cost(ann_o.costJs)
     print ann_o.a3.argmax(axis=1)
+    
+    d = datasets.load_diabetes() #for regression
+    data_array = np.hstack((d['data'],d['target'].reshape(-1,1)))
+    ann_r = ann_bp(data_array,num_2,num_3,alpha,reg_lambda,eplise,iter_max)
+    ann_r.get_arg_sigmoid()
+
 
